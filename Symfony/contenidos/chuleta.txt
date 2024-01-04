@@ -1,0 +1,67 @@
+--Instalacion symfony version 6.4
+
+Composer create-project symfony/skeleton:"6.4.*" <my_project_directory>
+composer require webapp
+
+*Problemas con php
+symfony local:php:list
+echo 8.2.12 >.php-version
+
+--Instalacion Twig
+composer require twig
+
+
+--Instalacion Doctrine-orm
+
+composer require symfony/orm-pack
+
+
+
+--Configuracion Doctrine
+
+/config/packages/doctrine.yaml
+
+
+
+--Credenciales Database 
+/env
+DATABASE_URL=mysql://root:12345@127.0.0.1:3306/bbdd_mi_proyecto
+
+
+
+
+
+
+
+--Ejecutar servidor symfony
+symfony server:start
+
+
+
+--Listar routes
+
+php bin/console debug:router
+
+--Generar Entidad
+php bin/console make:entity
+
+--Genera set y get
+php bin/console make:entity --regenerate --overwrite
+
+-- Reingenieria 
+php bin/console doctrine:mapping:import "app/entity" annotation 
+--Actualiza database
+php bin/console doctrine:schema:update --force
+
+php bin/console doctrine:migrations:migrate
+php bin/console make:migration
+
+
+--Operaciones Doctrine
+php bin/console list doctrine
+
+--Ejecutar sentencias dql
+php bin/console doctrine:query:dql  --show-sql <dql>
+
+-- Crear crud
+php bin/console make:crud  <clase>
