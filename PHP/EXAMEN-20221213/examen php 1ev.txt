@@ -1,0 +1,10 @@
+The system has to create a system of booking of classes for a gim
+
+	1. Database 1pt
+	2. Login 1pt
+	3. Control login (Cerrar sesion) 1pt
+	4. List classes 1pt
+	5. Book classes 2pt
+	6. Remove classes 2pt
+	7. List assistants (Mostrar los que van a asistir a una hora en concreto) 2pt
+	
