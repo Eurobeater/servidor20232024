@@ -1,0 +1,6 @@
+<h1>Profesores</h1>
+<ul>
+    {% for profesor in profesores %}
+        <li>{{ profesor.apellidos }}, {{ profesor.nombre }} {#} {{profesor.fecha_nacimiento | date ("d-m-Y") }} {#} </li>
+    {% endfor %}
+</ul>
