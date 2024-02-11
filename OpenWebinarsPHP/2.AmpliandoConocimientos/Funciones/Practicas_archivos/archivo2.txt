@@ -1,3 +1,0 @@
-Este es el contenido del fichero 
-Utilizamos PHP para leer 
-Utilizamos PHP para escribir Escribiendo en el archivo
