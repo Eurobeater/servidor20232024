@@ -1,0 +1,27 @@
+
+{# templates/lucky/number.html.twig #}
+ {#<h1>Your lucky number is {{ number }}</h1>}#}
+
+ <h1>Ésto es {{templateName}} y su controlador es {{controllerName}}</h1>
+
+ <p>Y la ruta es {{personaRoute}}</p>
+
+{#}
+ <h3>Listado de Personas</h3>
+
+<table>
+    <tr>
+        <td>Nombre</td>
+        <td>Apellidos</td>
+        <td>Edad</td>
+    </tr>
+    <tr>
+    {% for persona in personas %}
+    <td>{{persona.nombre}}</td>
+    <td>{{persona.apellidos}}</td>
+    <td>{{persona.edad}}</td>
+ {% endfor %}
+    </tr>
+</table>
+#}
+ 
