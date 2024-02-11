@@ -1,0 +1,79 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Documento sin título</title>
+<style type="text/css">
+	div.elem-group {
+  margin: 40px 0;
+}
+
+label {
+  display: block;
+  font-family: 'Aleo';
+  padding-bottom: 4px;
+  font-size: 1.25em;
+}
+
+input, select, textarea {
+  border-radius: 2px;
+  border: 1px solid #ccc;
+  box-sizing: border-box;
+  font-size: 1.25em;
+  font-family: 'Aleo';
+  width: 500px;
+  padding: 8px;
+}
+
+textarea {
+  height: 250px;
+}
+
+button {
+  height: 50px;
+  background: green;
+  color: white;
+  border: 2px solid darkgreen;
+  font-size: 1.25em;
+  font-family: 'Aleo';
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+button:hover {
+  border: 2px solid black;
+}	
+</style>
+</head>
+
+<body>
+<form id="form1" name="form1" method="post" action="procesa.php">
+	<div class="elem-group">
+    <label for="name">Nombre</label>
+    <input type="text" id="name" name="visitor_name" placeholder="John Doe"  required>
+  </div>
+  <div class="elem-group">
+    <label for="email">E-mail</label>
+    <input type="email" id="email" name="visitor_email" placeholder="john.doe@email.com" required>
+  </div>
+  <div class="elem-group">
+    <label for="department-selection">Departamento</label>
+    <select id="department-selection" name="concerned_department" required>
+        <option value="">Selecciona un Departamento</option>
+        <option value="billing">RRHH</option>
+        <option value="marketing">Marketing</option>
+        <option value="technical support">Soporte</option>
+    </select>
+  </div>
+  <div class="elem-group">
+    <label for="title">Observaciones</label>
+    <input type="text" id="title" name="email_title" required placeholder="Unable to Reset my Password" >
+  </div>
+  <div class="elem-group">
+    <label for="message">Escribe tu mensaje</label>
+    <textarea id="message" name="visitor_message" placeholder="Say whatever you want." required></textarea>
+  </div>
+  <button type="submit">Enviar Mensaje</button>
+</form>
+</body>
+</html>
