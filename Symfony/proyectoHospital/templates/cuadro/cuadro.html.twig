@@ -1,0 +1,21 @@
+{# plantilla/prueba.html.twig' #}
+{% extends 'default.html.twig' %}
+{% block contenido %}
+<h1>Cuadro médico</h1>
+
+<table>
+    <tr>
+    	<th>Especialidad</th>
+	</tr>
+	{% for especialidad in especialidades %}
+        <tr>
+			<td><a href="{{ path('app_especialidad_medico', { id: especialidad.id }) }}">{{especialidad.nombre}}</a></td>
+		</tr>
+    {% endfor %}
+</table>
+
+
+{% endblock %}
+{% block right %}
+{% include 'derecha.html.twig'%}
+{% endblock %}
