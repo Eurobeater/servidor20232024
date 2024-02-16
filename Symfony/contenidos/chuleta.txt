@@ -1,0 +1,228 @@
+--Instalacion symfony version 6.4
+
+Composer create-project symfony/skeleton:"6.4.*" <my_project_directory>
+composer require webapp
+
+	Si da error (sobretodo fechas) Undefined constant Doctrine\DBAL\Types\Types::ARRAY :
+	composer require doctrine/dbal:^3.8
+
+
+*Problemas con php
+symfony local:php:list
+echo 8.2.12 >.php-version
+
+--Instalacion Twig
+composer require twig
+
+
+--Instalacion Doctrine-orm
+
+composer require symfony/orm-pack
+
+
+
+--Configuracion Doctrine
+
+/config/packages/doctrine.yaml
+
+
+
+--Credenciales Database 
+/env
+DATABASE_URL=mysql://root:12345@127.0.0.1:3306/bbdd_mi_proyecto
+
+
+--Crear base de datos
+php bin/console doctrine:database:create
+
+
+
+
+--Ejecutar servidor symfony
+symfony server:start
+
+
+
+--Formulario
+composer require symfony/form
+
+--Crear formulario
+php bin/console make:form
+
+	Para poder procesar los datos enviados
+	composer require doctrine/common
+
+	Para enviar los datos del formulario (en EntidadType) (documentación de Symfony)
+	use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+	
+	Si da error de autowire services.yaml etc etc, usar éstas lineas de importación en el controlador:
+		use Symfony\Component\HttpFoundation\Request;                                                               
+		use Symfony\Component\HttpFoundation\Response;      
+		
+	Si sigue apareciendo el error, asegurar que en el controlador de una entidad no se esta instanciando la misma clase
+	es decir, BolsaController en la funcion de un formulario no instanciar la clase Bolsa
+		
+		NO USAR Symfony\Component\BrowserKit\Request. De lo contrario salta el error (o la alternativa mencionada)
+		
+
+
+--Listar routes
+
+php bin/console debug:router
+
+--Generar Entidad
+php bin/console make:entity
+
+-- Generar Controlador
+php bin/console make:controller <nombreControladorController>
+
+--Genera set y get
+php bin/console make:entity --regenerate --overwrite
+
+-- Reingenieria 
+php bin/console doctrine:mapping:import "app/entity" annotation 
+--Actualiza database
+php bin/console doctrine:schema:update --force
+
+php bin/console doctrine:migrations:migrate
+php bin/console make:migration
+
+
+--Operaciones Doctrine
+php bin/console list doctrine
+
+--Ejecutar sentencias dql
+php bin/console doctrine:query:dql  --show-sql <dql>
+
+-- Crear crud
+php bin/console make:crud  <clase>
+
+
+--SEGURIDAD
+FERNANDO: composer require symfony/security-bundle
+
+--Crear usuario:
+php bin/console make:user
+
+	Actualizar
+	php bin/console doctrine:schema:update --force
+	
+	Crear formulario de registro
+	composer require symfonycasts/verify-email-bundle
+	php bin/console make:registration-form
+	http://localhost:8000/register	
+	
+	
+	Copiar lineas de SeguridadController.php de fernando
+	
+		#[Route('/public/test_public', name: 'test_public')]
+    public function test_public()
+    {
+        return new Response( "Parte Publica" );
+    }
+
+    #[Route('/private/test_private', name: 'test_private')]
+    public function test_private()
+    {
+        return new Response( "Parte Private" );
+    }
+
+
+	Te pregunta a que direccion se quiere entrar 
+
+	private_test 
+	
+	
+	Cambiar fichero LoginController.php (o como se llame) y los templates (en la chuleta symfony_security.txt de fernando)
+	
+	
+
+--Creación password
+php bin/console security:hash-password
+
+	Crear migracion
+	php bin/console make:migration						
+
+	Migrar base de datos (por ejemplo meter la entidad User)
+	php bin/console doctrine:migrations:migrate
+
+	Autenticación
+	FERNANDO: php bin/console make:controller Login
+	php bin/console make:auth	(seleccionar Login form authenticator)
+	
+	Logearse con la url /login por defecto
+	
+	//OPCIONAL CURSO: Codificar y generar contraseñas para usuarios
+	php bin/console security_encode-password
+	
+	Para controlar accesos (no permitir que usuarios no logeados entren a dichas zonas) ir a /congig/security.yaml
+	y donde pone access_control, poner lo siguiente:
+	
+		- { path: ^/gestion/medicos, roles: IS_AUTHENTICATED_FULLY}
+	
+	
+	
+	En el template que se quiera ocultar si no se ha logeado, poner la siguiente sintaxis en el twig
+	
+		{% if is_granted('IS_AUTHENTICATED_FULLY') %}
+                      <li>
+                          <a href="{{ path('app_logout') }}" shape="rect">Logout</a>
+                      </li>
+                      <li>
+                          <a href="{{ path('app_gestion_medicos_index') }}" shape="rect">Gestión de Médicos</a>
+                      </li>
+                  {% else %}
+                      <li>
+                          <a href="{{ path('app_login') }}" shape="rect">Login</a>
+                      </li>
+                  {% endif %}
+
+
+
+--Validacion
+composer require symfony/validator
+
+	En la entidad que se quiere validar (un email etc) hay que añadir la siguiente línea de importación:
+	use Symfony\Component\Validator\Constraints as Assert;
+
+
+--Crear validator (crear más condiciones)
+php bin/console make:validator
+
+	Por ejemplo si estamos haciendo que no se admitan menores de edad o cualquier manejo
+	con fechas, tenemos que importar algo asi en la clase que queremos validar
+	use App\Validator\Age as AssertAge;
+
+	Poner en la entidad (Citas.php) que se quiere validar, encima del atributo lo siguiente:
+	
+		#[AssertAge()]
+		private ?\DateTimeInterface $datebirth = null;
+	
+
+	Para manejar fechas (en la EntidadType):
+
+	use Symfony\Component\Form\Extension\Core\Type\DateType;
+
+	$builder
+				->add('campo')
+				->add('datebirth', DateType::class, [ // Utilizar DateType
+					'years' => range(1900, date('Y')), // Permitir años desde 1900 hasta el año actual
+					//'widget' => 'single_text', // Utilizar un widget de entrada de texto único
+				])
+				->add('save', SubmitType::class);
+
+
+
+
+
+	Para manejar fechas de nacimiento (en la EntidadType):
+
+	use Symfony\Component\Form\Extension\Core\Type\BirthdayType;
+
+	$builder                                                                                                    
+				->add('campo')
+				->add('datebirth', BirthdayType::class, [                                                               
+					'years' => range(1900, date('Y')), // Permitir años desde 1900 hasta el año actual
+				])
+				->add('save', SubmitType::class);                                                                      
+         
