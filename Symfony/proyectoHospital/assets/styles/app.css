@@ -1,0 +1,7 @@
+body {
+    background-color: skyblue;
+}
+
+ul.vmenu li {
+    margin-bottom: 10px; /* Espaciado entre elementos */
+}   
