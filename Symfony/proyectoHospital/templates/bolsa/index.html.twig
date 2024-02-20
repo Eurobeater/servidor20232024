@@ -1,0 +1,16 @@
+{# plantilla/prueba.html.twig' #}
+{% extends 'default.html.twig' %}
+{% block contenido %}
+    <h1>Bolsa de trabajo</h1> 
+    {{form(form)}}
+
+    {% for flashMessage in app.flashes('error') %}                      <!-- Informar al usuario que la bolsa está caducada  -->
+        <div class="alert alert-danger">
+            {{ flashMessage }}
+        </div>
+    {% endfor %}
+
+{% endblock %}
+{% block right %}
+{% include 'derecha.html.twig'%}
+{% endblock %}
