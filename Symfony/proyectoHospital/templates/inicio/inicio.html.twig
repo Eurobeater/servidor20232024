@@ -1,0 +1,40 @@
+{# plantilla/prueba.html.twig' #}
+{% extends 'default.html.twig' %}
+{% block contenido %}
+<h1>Médicos</h1>
+
+{# Mostrar mensaje flash de éxito #}
+    {% for message in app.flashes('success') %}
+        <div class="alert alert-success" role="alert">
+            {{ message }}
+        </div>
+    {% endfor %}
+
+    <h4>Número de médicos: {{ pagination.getTotalItemCount }}</h4>
+
+
+<table class="table table-bordered">
+        <tr>
+            {# sorting of properties based on query components #}
+            <th{% if pagination.isSorted('p.nombre') %} class="sorted"{% endif %}>
+                {{ knp_pagination_sortable(pagination, 'Nombre', 'p.nombre') }}
+            </th>
+        </tr>
+ 
+        {# table body #}
+        {% for item in pagination %}
+            <tr {% if loop.index is odd %}class="color"{% endif %}>
+                <td>{{ item.nombre }}</td>
+            </tr>
+        {% endfor %}
+    </table>
+    {# display navigation #}
+    <div class="navigation">
+        {{ knp_pagination_render(pagination) }}
+    </div>
+
+
+{% endblock %}
+{% block right %}
+{% include 'derecha.html.twig'%}
+{% endblock %}

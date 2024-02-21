@@ -1,0 +1,31 @@
+{# plantilla/prueba.html.twig' #}
+{% extends 'default.html.twig' %}
+{% block contenido %}
+<h1>Cuadro médico</h1>
+
+<table class="table table-bordered">
+        <tr>
+            {# sorting of properties based on query components #}
+            <th{% if pagination.isSorted('e.nombre') %} class="sorted"{% endif %}>
+                {{ knp_pagination_sortable(pagination, 'Especialidad', 'e.nombre') }}
+            </th>
+        </tr>
+ 
+        {# table body #}
+        {% for item in pagination %}
+            <tr {% if loop.index is odd %}class="color"{% endif %}>
+                <td> <a href="{{ path('app_especialidad_medico', { id: item.id }) }}">{{ item.nombre }}</a></td>
+            </tr>
+        {% endfor %}
+    </table>
+    {# display navigation #}
+    <div class="navigation">
+        {{ knp_pagination_render(pagination) }}
+    </div>
+
+
+
+{% endblock %}
+{% block right %}
+{% include 'derecha.html.twig'%}
+{% endblock %}

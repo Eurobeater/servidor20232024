@@ -1,0 +1,31 @@
+{# plantilla/prueba.html.twig' #}
+{% extends 'default.html.twig' %}
+{% block contenido %}
+<h1>Medicos de {{ especialidad.nombre }}</h1>
+
+	<table class="table table-bordered">
+        <tr>
+            {# sorting of properties based on query components #}
+            <th{% if pagination.isSorted('m.nombre') %} class="sorted"{% endif %}>
+                {{ knp_pagination_sortable(pagination, 'Nombre', 'm.nombre') }}
+            </th>
+        </tr>
+ 
+        {# table body #}
+        {% for item in pagination %}
+            <tr {% if loop.index is odd %}class="color"{% endif %}>
+                <td>{{ item.nombre }}</td>
+            </tr>
+        {% endfor %}
+    </table>
+    {# display navigation #}
+    <div class="navigation">
+        {{ knp_pagination_render(pagination) }}
+    </div>
+
+
+
+{% endblock %}
+{% block right %}
+{% include 'derecha.html.twig'%}
+{% endblock %}

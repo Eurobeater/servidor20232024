@@ -1,0 +1,18 @@
+{# plantilla/prueba.html.twig' #}
+{% extends 'default.html.twig' %}
+{% block contenido %}
+
+<h1>{{ servicio.nombre }}</h1>
+    <h4>{{ servicio.descripcion }}</h4>
+
+    <p>Médicos que ofrecen el servicio:<p>
+    <ul>
+        {% for medico in medicos %}
+            <li>{{ medico.nombre }}</li> 
+        {% endfor %}
+    </ul>
+
+{% endblock %}
+{% block right %}
+{% include 'derecha.html.twig'%}
+{% endblock %}  
