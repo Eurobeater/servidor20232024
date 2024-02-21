@@ -1,0 +1,35 @@
+
+
+
+<div class="container-fluid">
+    <h1>Paginación con KnpPaginator</h1>                                                    
+ 
+    {# total items count #}
+    <div class="count">
+        <span class="label label-primary">
+            Entradas en total: {{ pagination.getTotalItemCount }}                           <!-- Mostrar el conteo de los elementos -->
+        </span>
+    </div>
+    <br/>
+    <table class="table table-bordered">
+        <tr>
+            {# sorting of properties based on query components #}
+            <th>{{ knp_pagination_sortable(pagination, 'ID', 'p.id') }}</th>
+            <th{% if pagination.isSorted('p.titulo') %} class="sorted"{% endif %}>
+                {{ knp_pagination_sortable(pagination, 'Titulo', 'p.titulo') }}
+            </th>
+        </tr>
+ 
+        {# table body #}
+        {% for item in pagination %}
+            <tr {% if loop.index is odd %}class="color"{% endif %}>
+                <td>{{ item.id }}</td>
+                <td>{{ item.titulo }}</td>
+            </tr>
+        {% endfor %}
+    </table>
+    {# display navigation #}
+    <div class="navigation">
+        {{ knp_pagination_render(pagination) }}
+    </div>
+</div>
