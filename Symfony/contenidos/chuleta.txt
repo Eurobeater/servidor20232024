@@ -1,0 +1,326 @@
+--Instalacion symfony version 6.4
+
+Composer create-project symfony/skeleton:"6.4.*" <my_project_directory>
+composer require webapp
+
+	Si da error (sobretodo fechas) Undefined constant Doctrine\DBAL\Types\Types::ARRAY :
+	composer require doctrine/dbal:^3.8
+
+
+*Problemas con php
+symfony local:php:list
+echo 8.2.12 >.php-version
+
+--Instalacion Twig
+composer require twig
+
+
+--Instalacion Doctrine-orm
+
+composer require symfony/orm-pack
+
+
+
+--Configuracion Doctrine
+
+/config/packages/doctrine.yaml
+
+
+
+--Credenciales Database 
+/env
+DATABASE_URL=mysql://root:12345@127.0.0.1:3306/bbdd_mi_proyecto
+
+
+--Crear base de datos
+php bin/console doctrine:database:create
+
+
+
+
+--Ejecutar servidor symfony
+symfony server:start
+
+
+
+--Formulario
+composer require symfony/form
+
+--Crear formulario
+php bin/console make:form
+
+	Para poder procesar los datos enviados
+	composer require doctrine/common
+
+	Para enviar los datos del formulario (en EntidadType) (documentación de Symfony)
+	use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+	
+	Si da error de autowire services.yaml etc etc, usar éstas lineas de importación en el controlador:
+		use Symfony\Component\HttpFoundation\Request;                                                               
+		use Symfony\Component\HttpFoundation\Response;      
+		
+	Si sigue apareciendo el error, asegurar que en el controlador de una entidad no se esta instanciando la misma clase
+	es decir, BolsaController en la funcion de un formulario no instanciar la clase Bolsa
+		
+		NO USAR Symfony\Component\BrowserKit\Request. De lo contrario salta el error (o la alternativa mencionada)
+		
+
+
+--Listar routes
+
+php bin/console debug:router
+
+--Generar Entidad
+php bin/console make:entity
+
+-- Generar Controlador
+php bin/console make:controller <nombreControladorController>
+
+--Genera set y get
+php bin/console make:entity --regenerate --overwrite
+
+-- Reingenieria 
+php bin/console doctrine:mapping:import "app/entity" annotation 
+--Actualiza database
+php bin/console doctrine:schema:update --force
+
+php bin/console doctrine:migrations:migrate
+php bin/console make:migration
+
+
+--Operaciones Doctrine
+php bin/console list doctrine
+
+--Ejecutar sentencias dql
+php bin/console doctrine:query:dql  --show-sql <dql>
+
+-- Crear crud
+php bin/console make:crud  <clase>
+
+
+-- Paginator
+composer require knplabs/knp-paginator-bundle
+
+
+	Insertar esto en config\packages\services.yaml
+	// config\packages\paginator.yaml
+	# KNP PAGINATOR
+	knp_paginator:
+		page_range: 5                       # number of links showed in the pagination menu (e.g: you have 10 pages, a page_range of 3, on the 5th page you'll see links to page 4, 5, 6)
+		default_options:                                 
+			page_name: page                 # page query parameter name
+			sort_field_name: sort           # sort field query parameter name
+			sort_direction_name: direction  # sort direction query parameter name
+			distinct: true                  # ensure distinct results, useful when ORM queries are using GROUP BY statements
+			filter_field_name: filterField  # filter field query parameter name
+			filter_value_name: filterValue  # filter value query paameter name
+		template:                                        
+			pagination: '@KnpPaginator/Pagination/sliding.html.twig'     # sliding pagination controls template                                    
+			sortable: '@KnpPaginator/Pagination/sortable_link.html.twig' # sort link template                                
+			filtration: '@KnpPaginator/Pagination/filtration.html.twig'  # filters template
+	
+		
+		
+	PaginatorController.php
+	
+	<?php
+
+	namespace App\Controller;
+
+	use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+	use Symfony\Component\HttpFoundation\Request;
+	use Symfony\Component\HttpFoundation\Response;
+	use Symfony\Component\Routing\Annotation\Route;
+	use Doctrine\ORM\EntityManagerInterface;
+	use Knp\Component\Pager\PaginatorInterface;
+	use App\Entity\Libro; // Asegúrate de importar la entidad Libro correctamente
+	
+	class PaginatorController extends AbstractController
+	{
+		#[Route("/paginator", name:"paginator_listado")]
+		public function index(Request $request, PaginatorInterface $paginator, EntityManagerInterface $em): Response
+		{
+			$query = $em->createQuery('SELECT l FROM App\Entity\Libro l'); // Corregir la consulta DQL                          Crear consulta DQL para seleccionar todos los registros de la entidad 'Libro'. se construye con createQuery(), pasando la cadena DQL como parámetro
+
+			// Paginar los resultados de la consulta
+			$pagination = $paginator->paginate(                                                                                 //objeto paginator. instancia de PaginatorInterface. para paginar los resultados de la consulta
+				// Consulta Doctrine, no resultados
+				$query,
+				// Definir el parámetro de la página
+				$request->query->getInt('page', 1),                                                                             //el número de la página actual (por defecto)
+				// Items per page                                                                                               //cuántos elementos mostrar por página
+				1
+			);
+        
+			// Renderizar la vista de twig
+			return $this->render('paginator/listado.html.twig', ['pagination' => $pagination]);                                 //mostrar el objeto pagination para mostrar en la vista la paginación
+		}
+	}
+
+
+	En el twig
+
+	
+	<div class="container-fluid">
+		<h1>Paginación con KnpPaginator</h1>                                                    
+ 
+		{# total items count #}
+		<div class="count">
+			<span class="label label-primary">
+				Entradas en total: {{ pagination.getTotalItemCount }}                           <!-- Mostrar el conteo de los elementos -->
+			</span>
+		</div>
+		<br/>
+		<table class="table table-bordered">
+			<tr>
+				{# sorting of properties based on query components #}
+				<th>{{ knp_pagination_sortable(pagination, 'ID', 'p.id') }}</th>
+				<th{% if pagination.isSorted('p.titulo') %} class="sorted"{% endif %}>
+					{{ knp_pagination_sortable(pagination, 'Titulo', 'p.titulo') }}
+				</th>
+			</tr>
+ 
+			{# table body #}
+			{% for item in pagination %}
+				<tr {% if loop.index is odd %}class="color"{% endif %}>
+					<td>{{ item.id }}</td>
+					<td>{{ item.titulo }}</td>
+            </tr>	
+			{% endfor %}
+		</table>
+		{# display navigation #}
+		<div class="navigation">
+			{{ knp_pagination_render(pagination) }}
+		</div>
+	</div>
+	
+	
+
+--SEGURIDAD
+FERNANDO: composer require symfony/security-bundle
+
+--Crear usuario:
+php bin/console make:user
+
+	Actualizar
+	php bin/console doctrine:schema:update --force
+	
+	Crear formulario de registro
+	composer require symfonycasts/verify-email-bundle
+	php bin/console make:registration-form
+	http://localhost:8000/register	
+	
+	
+	Copiar lineas de SeguridadController.php de fernando
+	
+		#[Route('/public/test_public', name: 'test_public')]
+    public function test_public()
+    {
+        return new Response( "Parte Publica" );
+    }
+
+    #[Route('/private/test_private', name: 'test_private')]
+    public function test_private()
+    {
+        return new Response( "Parte Private" );
+    }
+
+
+	Te pregunta a que direccion se quiere entrar 
+
+	private_test 
+	
+	
+	Cambiar fichero LoginController.php (o como se llame) y los templates (en la chuleta symfony_security.txt de fernando)
+	
+	
+
+--Creación password
+php bin/console security:hash-password
+
+	Crear migracion
+	php bin/console make:migration						
+
+	Migrar base de datos (por ejemplo meter la entidad User)
+	php bin/console doctrine:migrations:migrate
+
+	Autenticación
+	FERNANDO: php bin/console make:controller Login
+	php bin/console make:auth	(seleccionar Login form authenticator)
+	
+	Logearse con la url /login por defecto
+	
+	//OPCIONAL CURSO: Codificar y generar contraseñas para usuarios
+	php bin/console security_encode-password
+	
+	Para controlar accesos (no permitir que usuarios no logeados entren a dichas zonas) ir a /congig/security.yaml
+	y donde pone access_control, poner lo siguiente:
+	
+		- { path: ^/gestion/medicos, roles: IS_AUTHENTICATED_FULLY}
+	
+	
+	
+	En el template que se quiera ocultar si no se ha logeado, poner la siguiente sintaxis en el twig
+	
+		{% if is_granted('IS_AUTHENTICATED_FULLY') %}
+                      <li>
+                          <a href="{{ path('app_logout') }}" shape="rect">Logout</a>
+                      </li>
+                      <li>
+                          <a href="{{ path('app_gestion_medicos_index') }}" shape="rect">Gestión de Médicos</a>
+                      </li>
+                  {% else %}
+                      <li>
+                          <a href="{{ path('app_login') }}" shape="rect">Login</a>
+                      </li>
+                  {% endif %}
+
+
+
+--Validacion
+composer require symfony/validator
+
+	En la entidad que se quiere validar (un email etc) hay que añadir la siguiente línea de importación:
+	use Symfony\Component\Validator\Constraints as Assert;
+
+
+--Crear validator (crear más condiciones)
+php bin/console make:validator
+
+	Por ejemplo si estamos haciendo que no se admitan menores de edad o cualquier manejo
+	con fechas, tenemos que importar algo asi en la clase que queremos validar
+	use App\Validator\Age as AssertAge;
+
+	Poner en la entidad (Citas.php) que se quiere validar, encima del atributo lo siguiente:
+	
+		#[AssertAge()]
+		private ?\DateTimeInterface $datebirth = null;
+	
+
+	Para manejar fechas (en la EntidadType):
+
+	use Symfony\Component\Form\Extension\Core\Type\DateType;
+
+	$builder
+				->add('campo')
+				->add('datebirth', DateType::class, [ // Utilizar DateType
+					'years' => range(1900, date('Y')), // Permitir años desde 1900 hasta el año actual
+					//'widget' => 'single_text', // Utilizar un widget de entrada de texto único
+				])
+				->add('save', SubmitType::class);
+
+
+
+
+
+	Para manejar fechas de nacimiento (en la EntidadType):
+
+	use Symfony\Component\Form\Extension\Core\Type\BirthdayType;
+
+	$builder                                                                                                    
+				->add('campo')
+				->add('datebirth', BirthdayType::class, [                                                               
+					'years' => range(1900, date('Y')), // Permitir años desde 1900 hasta el año actual
+				])
+				->add('save', SubmitType::class);                                                                      
+         
